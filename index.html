@@ -1,0 +1,60 @@
+<html>
+
+<head>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/libs/timecircles/TimeCircles.js"></script>
+	<link href="assets/libs/timecircles/TimeCircles.css" rel="stylesheet">      
+	<style>
+	body{
+		background-color: #206fea;
+	}
+	#timer{
+		margin: auto;
+    	width: 40%;
+    	color:white;
+	}
+	</style>
+</head>
+
+<body>
+
+<div id="timer" data-timer="3480"></div>
+
+<script>
+$("#timer").TimeCircles({
+    "animation": "smooth",
+    "bg_width": 0.1,
+    "fg_width": 0.02666666666666667,
+    "circle_bg_color": "#000000",
+    "count_past_zero": false,
+    "time": {
+        "Days": {
+            "text": "Days",
+            "color": "#FFCC66",
+            "show": false
+        },
+        "Hours": {
+            "text": "Hours",
+            "color": "#99CCFF",
+            "show": false
+        },
+        "Minutes": {
+            "text": "",
+            "color": "#91f2d1",
+            "show": true
+        },
+        "Seconds": {
+            "text": "Seconds",
+            "color": "#FF9999",
+            "show": false
+        }
+    }
+});
+
+
+
+</script>
+
+</body>
+
+</html>

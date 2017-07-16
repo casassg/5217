@@ -15,7 +15,7 @@
     	font-family: Helvetica, Arial;
 	}
 	</style>
-	<title>5217 -  Productivity boost</title>
+	<title>5217</title>
 </head>
 
 <body>
@@ -51,6 +51,12 @@ $("#timer").TimeCircles({
             "show": false
         }
     }
+}).addListener(function(unit,value,total){
+	if (value == 0){
+		var audio = new Audio('assets/audio/Hope.mp3');
+		audio.play();
+	}
+	document.title = value+" min - 5217";
 });
 
 

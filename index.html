@@ -5,20 +5,42 @@
 	<script type="text/javascript" src="assets/libs/timecircles/TimeCircles.js"></script>
 	<link href="assets/libs/timecircles/TimeCircles.css" rel="stylesheet">      
 	<style>
+    #note {
+        position: absolute;
+        z-index: 101;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #91f2d1;
+        text-align: center;
+        line-height: 2.5;
+        overflow: hidden; 
+        -webkit-box-shadow: 0 0 5px black;
+        -moz-box-shadow:    0 0 5px black;
+        box-shadow:         0 0 5px black;
+        display: none;
+    }
+
+    #note > a {
+        color:black;
+    }
 
 	#timer{
 		margin: auto;
     	width: 40%;
     	color:white;
-    	font-family: Helvetica, Arial;
 	}
 	</style>
 	<title>5217</title>
 </head>
 
-<body style="background-color: #206fea;">
+<body style="background-color: #206fea; font-family: Helvetica, Arial;">
 
-<div id="timer" data-timer="3180"></div>
+<div id="note">
+    Activate notifications <a href="#" id="notifications">here</a><a href="#" id="close" style="text-decoration:none; float: right; margin-right: 20px">X</a>
+</div>
+
+<div id="timer"></div>
 
 <script>
 var LightenColor = function(color, percent) {
@@ -31,6 +53,15 @@ var LightenColor = function(color, percent) {
         return (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
 };
 
+var DarkenColor = function(color, percent) {
+    var num = parseInt(color,16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) - amt,
+        B = (num >> 8 & 0x00FF) - amt,
+        G = (num & 0x0000FF) - amt;
+
+        return (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+};
 
 //Function to convert hex format to a rgb color
 function rgb2hex(rgb){
@@ -40,45 +71,102 @@ function rgb2hex(rgb){
   ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
   ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 }
-
-$("#timer").TimeCircles({
-    "animation": "smooth",
-    "bg_width": 0.00000000001,
-    "fg_width": 0.02666666666666667,
-    "circle_bg_color": "#000000",
-    "count_past_zero": false,
-    "time": {
-        "Days": {
-            "text": "Days",
-            "color": "#FFCC66",
-            "show": false
-        },
-        "Hours": {
-            "text": "Hours",
-            "color": "#99CCFF",
-            "show": false
-        },
-        "Minutes": {
-            "text": "",
-            "color": "#91f2d1",
-            "show": true
-        },
-        "Seconds": {
-            "text": "Seconds",
-            "color": "#FF9999",
-            "show": false
+var $timer = $("#timer");
+var timer = false;
+function worktimer() {
+    $timer.data("timer",3180);
+    document.body.style.backgroundColor = "#206fea";
+    timer = $timer.TimeCircles({
+        "animation": "smooth",
+        "bg_width": 0.00000000001,
+        "fg_width": 0.02666666666666667,
+        "circle_bg_color": "#000000",
+        "count_past_zero": false,
+        "time": {
+            "Days": {
+                "text": "Days",
+                "color": "#FFCC66",
+                "show": false
+            },
+            "Hours": {
+                "text": "Hours",
+                "color": "#99CCFF",
+                "show": false
+            },
+            "Minutes": {
+                "text": "",
+                "color": "#91f2d1",
+                "show": true
+            },
+            "Seconds": {
+                "text": "",
+                "color": "#FF9999",
+                "show": false
+            }
         }
-    }
-}).addListener(function(unit,value,total){
-	if (value == 0){
-		var audio = new Audio('assets/audio/Hope.mp3');
-		audio.play();
-	}
-	document.title = value+" min - 5217";
-    var bgc1= rgb2hex(document.body.style.backgroundColor);
-    document.body.style.backgroundColor= "#"+LightenColor(bgc1.slice(1), 0.5);
+    }).addListener(function(unit,value,total){
+    	if (value == 0){
+    		var audio = new Audio('assets/audio/Hope.mp3');
+    		audio.play();
+            if (window.Notification && Notification.permission === "granted") {
+                var notification = new Notification("Take a break! 17 mins");
+            }
+            relaxtimer();
+    	}
+    	document.title = value+" min - 5217";
+        var bgc1= rgb2hex(document.body.style.backgroundColor);
+        document.body.style.backgroundColor= "#"+LightenColor(bgc1.slice(1), 0.6);
+        
 
+    });
+}
+
+function relaxtimer() {
+    $timer.data("timer",1020);
+    timer.destroy();
+    timer.start().addListener(function(unit,value,total){
+        if (value == 0){
+            var audio = new Audio('assets/audio/Hope.mp3');
+            audio.play();
+            if (window.Notification && Notification.permission === "granted") {
+                var notification = new Notification("Back to work!");
+            }
+            timer.destroy();
+            worktimer();
+        }
+        document.title = value+" min - 5217";
+        var bgc1= rgb2hex(document.body.style.backgroundColor);
+        document.body.style.backgroundColor= "#"+DarkenColor(bgc1.slice(1), 1.8);
+    });
+}
+
+
+window.addEventListener('load', function () {
+    var $note = $("#note");
+    var $notif = $("#notifications");
+    var $close = $("#close");
+    $close.on('click',function(){
+        $note.fadeOut();
+    })
+    if ("Notification" in window && Notification.permission === 'default'){
+        $note.show();
+        $notif.on('click', function(){
+            Notification.requestPermission(function (permission) {             
+                if (permission === "granted") {
+                    var notification = new Notification("It works :D");
+                    $note.fadeOut()
+                } else {
+                    $note.html("Sorry! We won't bother you then.");
+                    setTimeout(function() {
+                        $note.fadeOut()
+                    }, 5000);
+                }
+            });
+        })    
+    }
 });
+
+worktimer();
 
 
 

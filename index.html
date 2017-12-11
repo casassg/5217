@@ -1,4 +1,4 @@
-<html>
+s<html>
 
 <head>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -104,40 +104,39 @@ function worktimer() {
                 "show": false
             }
         }
-    }).addListener(function(unit,value,total){
-    	if (value == 0){
-    		var audio = new Audio('assets/audio/Hope.mp3');
-    		audio.play();
-            if (window.Notification && Notification.permission === "granted") {
-                var notification = new Notification("Take a break! 17 mins");
-            }
-            relaxtimer();
-    	}
+    })
+    .addListener(function(unit,value,total){
     	document.title = value+" min - 5217";
         var bgc1= rgb2hex(document.body.style.backgroundColor);
-        document.body.style.backgroundColor= "#"+LightenColor(bgc1.slice(1), 0.6);
-        
-
+        document.body.style.backgroundColor= "#"+LightenColor(bgc1.slice(1), 0.6);   
     });
+    var audio = new Audio('assets/audio/Hope.mp3');
+    setTimeout(function() {
+        audio.play();
+        if (window.Notification && Notification.permission === "granted") {
+            var notification = new Notification("Take a break! 17 mins");
+        }
+        relaxtimer();
+    },60000*52);
 }
 
 function relaxtimer() {
     $timer.data("timer",1020);
     timer.destroy();
     timer.start().addListener(function(unit,value,total){
-        if (value == 0){
-            var audio = new Audio('assets/audio/Hope.mp3');
-            audio.play();
-            if (window.Notification && Notification.permission === "granted") {
-                var notification = new Notification("Back to work!");
-            }
-            timer.destroy();
-            worktimer();
-        }
         document.title = value+" min - 5217";
         var bgc1= rgb2hex(document.body.style.backgroundColor);
         document.body.style.backgroundColor= "#"+DarkenColor(bgc1.slice(1), 1.8);
     });
+    var audio = new Audio('assets/audio/Hope.mp3');
+    setTimeout(function() {
+        audio.play();
+        if (window.Notification && Notification.permission === "granted") {
+            var notification = new Notification("Back to work!");
+        }
+        timer.destroy();
+        worktimer();
+    },60000*17);
 }
 
 
